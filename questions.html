@@ -11,7 +11,7 @@
     .btn-group { margin-top: 20px; display: flex; justify-content: space-between; }
     button { padding: 10px 20px; font-size: 16px; }
     .tag { color: gray; font-size: 0.9rem; margin-bottom: 4px; }
-    .guide { font-size: 0.9rem; color: #555; margin-top: 4px; }
+    .guide { font-size: 0.9rem; color: #555; margin-top: 6px; line-height: 1.6; white-space: pre-line; }
   </style>
 </head>
 <body>
@@ -32,15 +32,39 @@
     let currentIndex = 0;
 
     const guideMap = {
-      "CT-q1": "당신이 어떤 판단을 내렸는지 말한 뒤, 그 판단이 왜 옳다고 생각하는지를 구체적으로 설명해보세요. 다른 사람의 입장도 고려했는지, 어떤 기준으로 판단했는지도 함께 적어보면 좋아요.",
-      "CT-q2": "어떤 일이 일어난 이유와 그로 인해 생긴 결과를 차례대로 설명해보세요. 단순히 '왜 그런지'가 아니라, '그 이유가 왜 중요한지'까지 생각해보면 더 깊은 답변이 될 거예요.",
-      "CT-q3": "두 가지 이상의 대상(사람, 사건, 개념 등)을 비교하면서 공통점과 차이점을 예시와 함께 설명해보세요. 각각의 장단점이나 상황에 따라 달라지는 부분도 같이 언급하면 훌륭해요.",
-      "CT-q4": "질문에서 주어진 상황을 다른 맥락이나 현실 문제에 어떻게 적용할 수 있을지 상상해보세요. 또, 그런 적용이 왜 타당한지 근거를 제시하고, 새로운 관점이나 아이디어로 확장해보세요.",
-      "CT-q5": "당신의 실제 경험, 주변에서 본 사례 또는 뉴스를 예로 들어 설명해보세요. 단지 사례를 언급하는 것에 그치지 말고, 그 사례가 왜 이 질문에 적절한지 이유를 함께 설명해보면 좋아요.",
-      "CT-q6": "자신의 생각을 다시 돌아보며 부족했던 점, 바뀐 생각, 실수한 부분이 있었다면 솔직하게 적어보세요.</br> 그 이유와 함께, 다음에는 어떻게 더 나은 사고나 판단을 할 수 있을지도 적어보면 훌륭해요."
+      "CT-q1": {
+        kr: "당신이 어떤 판단을 내렸는지 말한 뒤, 그 판단이 왜 옳다고 생각하는지를 구체적으로 설명해보세요. 다른 사람의 입장도 고려했는지, 어떤 기준으로 판단했는지도 함께 적어보면 좋아요.",
+        en: "Explain what decision you made, and why you think it was the right one. Did you consider other perspectives or use any criteria in your judgment?",
+        ar: "اشرح ما هو القرار الذي اتخذته ولماذا تعتقد أنه القرار الصحيح. هل أخذت بعين الاعتبار آراء الآخرين أو استخدمت معايير محددة؟"
+      },
+      "CT-q2": {
+        kr: "어떤 일이 일어난 이유와 그로 인해 생긴 결과를 차례대로 설명해보세요. 단순히 '왜 그런지'가 아니라, '그 이유가 왜 중요한지'까지 생각해보면 더 깊은 답변이 될 거예요.",
+        en: "Describe the cause of an event and the result step-by-step. Go beyond 'why'—think about why that reason matters.",
+        ar: "اشرح سبب حدوث الموقف وما هي نتائجه بشكل متسلسل. لا تكتفِ بالسؤال 'لماذا'، بل فكر في أهمية السبب أيضًا."
+      },
+      "CT-q3": {
+        kr: "두 가지 이상의 대상(사람, 사건, 개념 등)을 비교하면서 공통점과 차이점을 예시와 함께 설명해보세요. 각각의 장단점이나 상황에 따라 달라지는 부분도 같이 언급하면 훌륭해요.",
+        en: "Compare two or more subjects by explaining similarities and differences with examples. Mention strengths, weaknesses, or context-based differences.",
+        ar: "قارن بين موضوعين أو أكثر من خلال إبراز أوجه الشبه والاختلاف مع أمثلة توضيحية. وضّح أيضًا المزايا والعيوب أو الفروقات حسب السياق."
+      },
+      "CT-q4": {
+        kr: "질문에서 주어진 상황을 다른 맥락이나 현실 문제에 어떻게 적용할 수 있을지 상상해보세요. 또, 그런 적용이 왜 타당한지 근거를 제시하고, 새로운 관점이나 아이디어로 확장해보세요.",
+        en: "Apply the situation to a new context or real issue. Justify why the application is relevant, and expand with new ideas or viewpoints.",
+        ar: "حاول تطبيق الموقف على سياق مختلف أو مشكلة واقعية. فسّر لماذا يعتبر هذا التطبيق مناسبًا، ووسع الفكرة من خلال منظور جديد."
+      },
+      "CT-q5": {
+        kr: "당신의 실제 경험, 주변에서 본 사례 또는 뉴스를 예로 들어 설명해보세요. 그 사례가 왜 이 질문에 적절한지 이유까지 함께 설명해보면 좋아요.",
+        en: "Support your answer with personal experience, case studies, or news. Explain why this example fits the question.",
+        ar: "استخدم تجربة واقعية، حالة شاهدتها أو خبرًا كمثال. وفسر لماذا هذا المثال مناسب لهذا السؤال."
+      },
+      "CT-q6": {
+        kr: "자신의 생각을 다시 돌아보며 부족했던 점이나 바뀐 생각, 실수한 부분이 있었다면 솔직하게 적어보세요. 그리고 다음에 어떻게 더 나은 판단을 할 수 있을지 적어보세요.",
+        en: "Reflect on your thinking. Mention any weaknesses, changes in opinion, or mistakes. Explain how you will improve your judgment in the future.",
+        ar: "فكر في تفكيرك السابق، وكن صريحًا بشأن نقاط الضعف أو التغيرات أو الأخطاء. واشرح كيف يمكنك تحسين حكمك لاحقًا."
+      }
     };
 
-
+    // 초기화
     window.addEventListener('load', () => {
       localStorage.removeItem('ct-answers');
     });
@@ -48,71 +72,83 @@
     async function loadQuestions() {
       const res = await fetch('questions.json');
       const allQuestions = await res.json();
-
       const selectedTarget = localStorage.getItem('selectedTarget');
       if (!selectedTarget) {
-        alert("대상(target)을 먼저 선택해주세요.");
+        alert("대상을 먼저 선택해주세요.");
         window.location.href = "index.html";
         return;
       }
-
       questions = allQuestions.filter(q => q.target === selectedTarget);
       if (questions.length === 0) {
-        alert(`'${selectedTarget}' 대상의 질문이 없습니다.`);
+        alert(`'${selectedTarget}'에 해당하는 질문이 없습니다.`);
         return;
       }
-
       showQuestion();
     }
 
     function showQuestion() {
       const q = questions[currentIndex];
-      document.getElementById('question-text').innerText = `Q${currentIndex + 1}. ${q.question}`;
-      document.getElementById('answer-text').value = getAnswer(currentIndex);
+      const tag = q.tag || q.tags || "";
+      const lang = localStorage.getItem("lang") || "kr";
 
-      const tagText = q.tags || q.tag || "";
-      document.getElementById('tag-info').innerText = tagText ? `태그: ${tagText}` : "";
+      document.getElementById("question-text").innerText = `Q${currentIndex + 1}. ${q.question}`;
+      document.getElementById("answer-text").value = getAnswer(currentIndex);
+      document.getElementById("tag-info").innerText = tag ? `태그: ${tag}` : "";
 
-      const guide = guideMap[tagText] || "예시나 이유를 들어 자세히 설명해보세요.";
-      document.getElementById('guideline-text').innerText = guide;
+      const guide = guideMap[tag]?.[lang] || "";
+      document.getElementById("guideline-text").innerText = guide;
     }
 
     function getAnswer(index) {
-      const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+      const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
       return data[`q${index}`]?.answer || "";
     }
 
     async function nextQuestion() {
-      const answer = document.getElementById('answer-text').value.trim();
+      const answer = document.getElementById("answer-text").value.trim();
       if (answer.length === 0) {
         alert("답변을 입력해주세요.");
         return;
       }
       if (answer.length < 10) {
-        alert("답변이 너무 짧습니다. 최소 10자 이상 입력해주세요.");
+        alert("답변이 너무 짧습니다. 최소 10자 이상 작성해주세요.");
         return;
       }
 
       saveAnswer(currentIndex, answer);
-
       if (currentIndex > 0) {
-        const prevAnswer = getAnswer(currentIndex - 1);
-        await evaluateWithGPT(currentIndex - 1, prevAnswer);
+        await evaluateWithGPT(currentIndex - 1, getAnswer(currentIndex - 1));
       }
 
       if (currentIndex < questions.length - 1) {
         currentIndex++;
         showQuestion();
       } else {
-        alert("모든 질문을 완료했습니다. 결과를 확인합니다.");
-        window.location.href = 'result.html';
+        alert("모든 질문이 완료되었습니다.");
+        window.location.href = "result.html";
       }
     }
 
+    async function forceFinish() {
+      const answer = document.getElementById("answer-text").value.trim();
+      if (answer.length === 0) {
+        alert("답변을 입력해주세요.");
+        return;
+      }
+
+      saveAnswer(currentIndex, answer);
+      if (currentIndex > 0) {
+        await evaluateWithGPT(currentIndex - 1, getAnswer(currentIndex - 1));
+      }
+
+      alert("평가가 완료되었습니다.");
+      window.location.href = "result.html";
+    }
+
     function saveAnswer(index, answer) {
-      const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+      const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
       data[`q${index}`] = { answer };
-      localStorage.setItem('ct-answers', JSON.stringify(data));
+      localStorage.setItem("ct-answers", JSON.stringify(data));
     }
 
     async function evaluateWithGPT(index, answer) {
@@ -125,37 +161,18 @@
       };
 
       try {
-        const res = await fetch('/api/evaluate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/evaluate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-
         const result = await res.json();
-        const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+        const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
         data[`q${index}`].evaluation = result;
-        localStorage.setItem('ct-answers', JSON.stringify(data));
-      } catch (e) {
-        console.error("GPT 평가 실패:", e);
+        localStorage.setItem("ct-answers", JSON.stringify(data));
+      } catch (err) {
+        console.error("GPT 평가 실패:", err);
       }
-    }
-
-    async function forceFinish() {
-      const answer = document.getElementById('answer-text').value.trim();
-      if (answer.length === 0) {
-        alert("답변을 입력해주세요.");
-        return;
-      }
-
-      saveAnswer(currentIndex, answer);
-
-      if (currentIndex > 0) {
-        const prevAnswer = getAnswer(currentIndex - 1);
-        await evaluateWithGPT(currentIndex - 1, prevAnswer);
-      }
-
-      alert("평가가 완료되었습니다.");
-      window.location.href = 'result.html';
     }
 
     loadQuestions();
