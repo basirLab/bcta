@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>질문 응답</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    .question-box { margin-bottom: 20px; }
+    .textarea { width: 100%; height: 120px; margin-top: 10px; }
+    .btn-group { margin-top: 20px; display: flex; justify-content: space-between; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>질문 응답</h1>
+  <div id="question-container" class="question-box">
+    <div id="question-text">로딩 중...</div>
+    <textarea id="answer-text" class="textarea" placeholder="여기에 답변을 입력하세요"></textarea>
+  </div>
+  <div class="btn-group">
+    <button onclick="nextQuestion()">다음 질문</button>
+    <button onclick="forceFinish()">평가하기</button>
+  </div>
+
+  <script>
+    let questions = [];
+    let currentIndex = 0;
+
+    async function loadQuestions() {
+      const res = await fetch('questions.json');
+      questions = await res.json();
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById('question-text').innerText = `Q${currentIndex + 1}. ${q.question}`;
+      document.getElementById('answer-text').value = getAnswer(currentIndex);
+    }
+
+    function getAnswer(index) {
+      const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+      return data[`q${index}`]?.answer || "";
+    }
+
+    async function nextQuestion() {
+      const answer = document.getElementById('answer-text').value;
+      saveAnswer(currentIndex, answer);
+
+      await evaluateWithGPT(currentIndex, answer);
+
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        showQuestion();
+      } else {
+        alert("모든 질문을 완료했습니다. 결과를 확인합니다.");
+        window.location.href = 'result.html';
+      }
+    }
+
+    function saveAnswer(index, answer) {
+      const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+      data[`q${index}`] = { answer };
+      localStorage.setItem('ct-answers', JSON.stringify(data));
+    }
+
+    async function evaluateWithGPT(index, answer) {
+      const question = questions[index];
+      const payload = {
+        question: question.question,
+        answer: answer,
+        rubric: "CT1~CT6 루브릭에 따라 평가해주세요.",
+        tags: question.tags
+      };
+
+      try {
+        const res = await fetch('https://your-api-endpoint.com/gpt-evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json(); // result: { CT1: 3, CT2: 2, ..., feedback: { CT1: "...", CT2: "...", ... } }
+
+        const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
+        data[`q${index}`].evaluation = result;
+        localStorage.setItem('ct-answers', JSON.stringify(data));
+      } catch (e) {
+        console.error("GPT 평가 실패:", e);
+      }
+    }
+
+    function forceFinish() {
+      window.location.href = 'result.html';
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>
