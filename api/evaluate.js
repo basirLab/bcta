@@ -1,24 +1,40 @@
-const express = require("express");
-const cors = require("cors");
-const { evaluateAnswer } = require("./openai");
+// api/evaluate.js
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static("public"));
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST allowed' });
+  }
 
-app.post("/gpt-evaluate", async (req, res) => {
-  const { question, answer, rubric, tags } = req.body;
+  const { message, rubric } = req.body;
+
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  if (!openaiApiKey) {
+    return res.status(500).json({ error: 'Missing OpenAI API key' });
+  }
 
   try {
-    const evaluation = await evaluateAnswer(question, answer, rubric, tags || []);
-    res.json(evaluation);
-  } catch (e) {
-    console.error("OpenAI 평가 실패:", e);
-    res.status(500).json({ error: "GPT 평가 실패" });
-  }
-});
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          { role: "system", content: rubric },
+          { role: "user", content: message }
+        ],
+        temperature: 0.2
+      })
+    });
 
-app.listen(3000, () => {
-  console.log("서버가 http://localhost:3000 에서 실행 중");
-});
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No response";
+
+    res.status(200).json({ result: reply });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'OpenAI API request failed' });
+  }
+}
