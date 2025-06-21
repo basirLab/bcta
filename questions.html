@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>질문 응답</title>
   <style>
     body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
@@ -11,6 +11,7 @@
     .btn-group { margin-top: 20px; display: flex; justify-content: space-between; }
     button { padding: 10px 20px; font-size: 16px; }
     .tag { color: gray; font-size: 0.9rem; margin-bottom: 4px; }
+    .guide { font-size: 0.9rem; color: #555; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -18,6 +19,7 @@
   <div id="question-container" class="question-box">
     <div id="tag-info" class="tag"></div>
     <div id="question-text">로딩 중...</div>
+    <p id="guideline-text" class="guide"></p>
     <textarea id="answer-text" class="textarea" placeholder="여기에 답변을 입력하세요"></textarea>
   </div>
   <div class="btn-group">
@@ -28,6 +30,15 @@
   <script>
     let questions = [];
     let currentIndex = 0;
+
+    const guideMap = {
+      "CT-q1": "어떤 선택이 더 옳은지 판단하는 이유를 설명해보세요. 왜 그렇게 생각하나요?",
+      "CT-q2": "어떤 원인 때문에 그렇게 되었는지, 결과는 무엇인지 설명해보세요.",
+      "CT-q3": "두 가지의 차이점과 공통점을 예시를 들어 비교해보세요.",
+      "CT-q4": "지금 내용을 다른 상황에 적용하거나, 새롭게 추론해보세요.",
+      "CT-q5": "실제 자신의 경험이나 사례를 들어 설명해보세요.",
+      "CT-q6": "내 생각에서 부족한 점이나 다시 생각해볼 점은 무엇인지 말해보세요."
+    };
 
     window.addEventListener('load', () => {
       localStorage.removeItem('ct-answers');
@@ -45,7 +56,6 @@
       }
 
       questions = allQuestions.filter(q => q.target === selectedTarget);
-
       if (questions.length === 0) {
         alert(`'${selectedTarget}' 대상의 질문이 없습니다.`);
         return;
@@ -58,8 +68,12 @@
       const q = questions[currentIndex];
       document.getElementById('question-text').innerText = `Q${currentIndex + 1}. ${q.question}`;
       document.getElementById('answer-text').value = getAnswer(currentIndex);
+
       const tagText = q.tags || q.tag || "";
       document.getElementById('tag-info').innerText = tagText ? `태그: ${tagText}` : "";
+
+      const guide = guideMap[tagText] || "예시나 이유를 들어 자세히 설명해보세요.";
+      document.getElementById('guideline-text').innerText = guide;
     }
 
     function getAnswer(index) {
@@ -80,7 +94,6 @@
 
       saveAnswer(currentIndex, answer);
 
-      // ✅ GPT 평가는 현재 질문이 아닌, 이전 질문에 대해 실행
       if (currentIndex > 0) {
         const prevAnswer = getAnswer(currentIndex - 1);
         await evaluateWithGPT(currentIndex - 1, prevAnswer);
@@ -135,7 +148,6 @@
 
       saveAnswer(currentIndex, answer);
 
-      // 현재 질문이 2번째 이상일 때만 마지막 질문 평가
       if (currentIndex > 0) {
         const prevAnswer = getAnswer(currentIndex - 1);
         await evaluateWithGPT(currentIndex - 1, prevAnswer);
