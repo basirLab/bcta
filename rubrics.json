@@ -1,0 +1,62 @@
+{
+  "CT1": {
+    "name": "Interpretation",
+    "label_kr": "해석력",
+    "levels": [
+      "Misinterprets the question or responds off-topic, showing confusion or lack of clarity.",
+      "Understands the surface meaning but misses key elements or misrepresents the core idea.",
+      "Understands the key message and restates the question meaningfully with some contextual grasp.",
+      "Clearly restates the prompt in original wording, capturing both core and implicit meanings, including assumptions and context."
+    ]
+  },
+  "CT2": {
+    "name": "Analysis",
+    "label_kr": "분석력",
+    "levels": [
+      "No clear structure; claims, evidence, and reasoning are mixed or absent.",
+      "Distinguishes some elements (e.g., claim vs. evidence) but with weak or unclear connections.",
+      "Separates key components and attempts to show their logical relationships.",
+      "Breaks down information precisely into structured parts and maps out strong logical relationships between them."
+    ]
+  },
+  "CT3": {
+    "name": "Evaluation",
+    "label_kr": "평가력",
+    "levels": [
+      "No attempt to assess the quality or relevance of the information.",
+      "Mentions evidence but lacks critical analysis or judgment of its credibility.",
+      "Evaluates at least one piece of evidence with justified reasoning.",
+      "Compares multiple pieces of evidence, judging credibility and relevance using clear evaluation criteria."
+    ]
+  },
+  "CT4": {
+    "name": "Inference",
+    "label_kr": "추론력",
+    "levels": [
+      "Conclusion is missing, invalid, or disconnected from the information.",
+      "A conclusion is given but relies on assumptions or contains logical gaps.",
+      "Draws a valid conclusion based on provided information.",
+      "Constructs a logically sound conclusion from multiple sources, while addressing possible counterarguments."
+    ]
+  },
+  "CT5": {
+    "name": "Explanation",
+    "label_kr": "설명력",
+    "levels": [
+      "Disorganized, vague, or hard to follow; lacks coherence.",
+      "Basic structure exists but lacks clarity or logical progression.",
+      "Uses a clear structure (e.g., intro–body–conclusion) with mostly coherent explanation.",
+      "Highly coherent and structured argument; communicates reasoning effectively for reader understanding."
+    ]
+  },
+  "CT6": {
+    "name": "Self-Regulation",
+    "label_kr": "자기조절력",
+    "levels": [
+      "Shows no reflection or awareness of possible errors.",
+      "Acknowledges possible errors but without depth or clarity.",
+      "Recognizes limitations and addresses them with brief reflection.",
+      "Actively identifies weaknesses or flaws in reasoning and explains how they were considered or addressed."
+    ]
+  }
+}
