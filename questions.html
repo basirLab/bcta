@@ -29,6 +29,11 @@
     let questions = [];
     let currentIndex = 0;
 
+    // ✅ 로딩 시 기존 답변 초기화
+    window.addEventListener('load', () => {
+      localStorage.removeItem('ct-answers');
+    });
+
     async function loadQuestions() {
       const res = await fetch('questions.json');
       questions = await res.json();
@@ -50,9 +55,15 @@
     }
 
     async function nextQuestion() {
-      const answer = document.getElementById('answer-text').value;
-      saveAnswer(currentIndex, answer);
+      const answer = document.getElementById('answer-text').value.trim();
 
+      // ✅ 답변 길이 제한 검사
+      if (answer.length < 10) {
+        alert("답변이 너무 짧습니다. 최소 10자 이상 입력해주세요.");
+        return;
+      }
+
+      saveAnswer(currentIndex, answer);
       await evaluateWithGPT(currentIndex, answer);
 
       if (currentIndex < questions.length - 1) {
