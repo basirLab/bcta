@@ -20,11 +20,12 @@
     </div>
   </div>
 
-  <script>
-    function selectUser(type) {
-      localStorage.setItem('userType', type);
-      window.location.href = 'questions.html';
-    }
-  </script>
+<script>
+  function start() {
+    const target = document.getElementById("target-select").value;
+    localStorage.setItem("selectedTarget", target);
+    window.location.href = "questions.html";
+  }
+</script>
 </body>
 </html>
