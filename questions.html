@@ -36,7 +36,23 @@
 
     async function loadQuestions() {
       const res = await fetch('questions.json');
-      questions = await res.json();
+      const allQuestions = await res.json();
+
+      // ✅ 타겟 불러오기 및 필터링
+      const selectedTarget = localStorage.getItem('selectedTarget');
+      if (!selectedTarget) {
+        alert("대상(target)을 먼저 선택해주세요.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      questions = allQuestions.filter(q => q.target === selectedTarget);
+
+      if (questions.length === 0) {
+        alert(`'${selectedTarget}' 대상의 질문이 없습니다.`);
+        return;
+      }
+
       showQuestion();
     }
 
