@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>BCTA 평가 결과</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h1 { text-align: center; }
+    .score-box { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    .score-box h2 { margin: 0; font-size: 18px; }
+    .score { font-weight: bold; font-size: 16px; }
+    .feedback { margin-top: 5px; color: #555; }
+    button { margin: 20px 10px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>📊 비판적 사고 평가 결과</h1>
+  <div id="resultsContainer"></div>
+
+  <div style="text-align:center;">
+    <button onclick="location.href='index.html'">메인으로</button>
+    <button onclick="location.href='questions.html'">다시 하기</button>
+  </div>
+
+  <script>
+    const results = JSON.parse(localStorage.getItem("bctaResults") || "[]");
+
+    const CT_CODES = ["CT1", "CT2", "CT3", "CT4", "CT5", "CT6"];
+    const CT_LABELS = {
+      CT1: "해석력", CT2: "분석력", CT3: "평가력",
+      CT4: "추론력", CT5: "설명력", CT6: "자기조절력"
+    };
+
+    const total = { CT1: [], CT2: [], CT3: [], CT4: [], CT5: [], CT6: [] };
+    const feedbacks = { CT1: [], CT2: [], CT3: [], CT4: [], CT5: [], CT6: [] };
+
+    results.forEach(item => {
+      CT_CODES.forEach(code => {
+        total[code].push(item.evaluation[code].score);
+        feedbacks[code].push(item.evaluation[code].feedback);
+      });
+    });
+
+    const container = document.getElementById("resultsContainer");
+
+    CT_CODES.forEach(code => {
+      const scores = total[code];
+      const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
+      const feedback = feedbacks[code][feedbacks[code].length - 1]; // 가장 최근 피드백
+
+      const box = document.createElement("div");
+      box.className = "score-box";
+      box.innerHTML = `
+        <h2>${CT_LABELS[code]} (${code})</h2>
+        <div class="score">평균 점수: ${avg.toFixed(1)} / 4</div>
+        <div class="feedback">📝 ${feedback}</div>
+      `;
+      container.appendChild(box);
+    });
+  </script>
+</body>
+</html>
