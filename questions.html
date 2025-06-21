@@ -10,11 +10,13 @@
     .textarea { width: 100%; height: 120px; margin-top: 10px; }
     .btn-group { margin-top: 20px; display: flex; justify-content: space-between; }
     button { padding: 10px 20px; font-size: 16px; }
+    .tag { color: gray; font-size: 0.9rem; margin-bottom: 4px; }
   </style>
 </head>
 <body>
   <h1>질문 응답</h1>
   <div id="question-container" class="question-box">
+    <div id="tag-info" class="tag"></div>
     <div id="question-text">로딩 중...</div>
     <textarea id="answer-text" class="textarea" placeholder="여기에 답변을 입력하세요"></textarea>
   </div>
@@ -37,6 +39,9 @@
       const q = questions[currentIndex];
       document.getElementById('question-text').innerText = `Q${currentIndex + 1}. ${q.question}`;
       document.getElementById('answer-text').value = getAnswer(currentIndex);
+
+      const tagText = q.tags || q.tag || "";
+      document.getElementById('tag-info').innerText = tagText ? `태그: ${tagText}` : "";
     }
 
     function getAnswer(index) {
@@ -71,18 +76,17 @@
         question: question.question,
         answer: answer,
         rubric: "CT1~CT6 루브릭에 따라 평가해주세요.",
-        tags: question.tags
+        tags: question.tags || question.tag
       };
 
       try {
-        const res = await fetch('https://your-api-endpoint.com/gpt-evaluate', {
+        const res = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        const result = await res.json(); // result: { CT1: 3, CT2: 2, ..., feedback: { CT1: "...", CT2: "...", ... } }
-
+        const result = await res.json();
         const data = JSON.parse(localStorage.getItem('ct-answers') || '{}');
         data[`q${index}`].evaluation = result;
         localStorage.setItem('ct-answers', JSON.stringify(data));
