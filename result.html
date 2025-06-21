@@ -23,7 +23,8 @@
   </div>
 
   <script>
-    const results = JSON.parse(localStorage.getItem("bctaResults") || "[]");
+    const raw = JSON.parse(localStorage.getItem("ct-answers") || "{}");
+    const results = Object.values(raw).filter(item => item.evaluation);
 
     const CT_CODES = ["CT1", "CT2", "CT3", "CT4", "CT5", "CT6"];
     const CT_LABELS = {
@@ -36,8 +37,10 @@
 
     results.forEach(item => {
       CT_CODES.forEach(code => {
-        total[code].push(item.evaluation[code].score);
-        feedbacks[code].push(item.evaluation[code].feedback);
+        const score = item.evaluation[code]?.score || 0;
+        const fb = item.evaluation[code]?.feedback || "피드백 없음";
+        total[code].push(score);
+        feedbacks[code].push(fb);
       });
     });
 
@@ -45,8 +48,8 @@
 
     CT_CODES.forEach(code => {
       const scores = total[code];
-      const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
-      const feedback = feedbacks[code][feedbacks[code].length - 1]; // 가장 최근 피드백
+      const avg = scores.reduce((a, b) => a + b, 0) / (scores.length || 1);
+      const feedback = feedbacks[code][feedbacks[code].length - 1];
 
       const box = document.createElement("div");
       box.className = "score-box";
