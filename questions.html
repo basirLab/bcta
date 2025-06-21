@@ -29,7 +29,6 @@
     let questions = [];
     let currentIndex = 0;
 
-    // ✅ 로딩 시 기존 답변 초기화
     window.addEventListener('load', () => {
       localStorage.removeItem('ct-answers');
     });
@@ -38,7 +37,6 @@
       const res = await fetch('questions.json');
       const allQuestions = await res.json();
 
-      // ✅ 타겟 불러오기 및 필터링
       const selectedTarget = localStorage.getItem('selectedTarget');
       if (!selectedTarget) {
         alert("대상(target)을 먼저 선택해주세요.");
@@ -60,7 +58,6 @@
       const q = questions[currentIndex];
       document.getElementById('question-text').innerText = `Q${currentIndex + 1}. ${q.question}`;
       document.getElementById('answer-text').value = getAnswer(currentIndex);
-
       const tagText = q.tags || q.tag || "";
       document.getElementById('tag-info').innerText = tagText ? `태그: ${tagText}` : "";
     }
@@ -72,15 +69,22 @@
 
     async function nextQuestion() {
       const answer = document.getElementById('answer-text').value.trim();
-
-      // ✅ 답변 길이 제한 검사
+      if (answer.length === 0) {
+        alert("답변을 입력해주세요.");
+        return;
+      }
       if (answer.length < 10) {
         alert("답변이 너무 짧습니다. 최소 10자 이상 입력해주세요.");
         return;
       }
 
       saveAnswer(currentIndex, answer);
-      await evaluateWithGPT(currentIndex, answer);
+
+      // ✅ GPT 평가는 현재 질문이 아닌, 이전 질문에 대해 실행
+      if (currentIndex > 0) {
+        const prevAnswer = getAnswer(currentIndex - 1);
+        await evaluateWithGPT(currentIndex - 1, prevAnswer);
+      }
 
       if (currentIndex < questions.length - 1) {
         currentIndex++;
@@ -122,7 +126,22 @@
       }
     }
 
-    function forceFinish() {
+    async function forceFinish() {
+      const answer = document.getElementById('answer-text').value.trim();
+      if (answer.length === 0) {
+        alert("답변을 입력해주세요.");
+        return;
+      }
+
+      saveAnswer(currentIndex, answer);
+
+      // 현재 질문이 2번째 이상일 때만 마지막 질문 평가
+      if (currentIndex > 0) {
+        const prevAnswer = getAnswer(currentIndex - 1);
+        await evaluateWithGPT(currentIndex - 1, prevAnswer);
+      }
+
+      alert("평가가 완료되었습니다.");
       window.location.href = 'result.html';
     }
 
