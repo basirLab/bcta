@@ -2,180 +2,117 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>질문 응답</title>
+  <title>🧠 BCTA 질문 시작</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    .question-box { margin-bottom: 20px; }
-    .textarea { width: 100%; height: 120px; margin-top: 10px; }
-    .btn-group { margin-top: 20px; display: flex; justify-content: space-between; }
-    button { padding: 10px 20px; font-size: 16px; }
-    .tag { color: gray; font-size: 0.9rem; margin-bottom: 4px; }
-    .guide { font-size: 0.9rem; color: #555; margin-top: 6px; line-height: 1.6; white-space: pre-line; }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 40px;
+    }
+    .question-box {
+      border-left: 5px solid #4caf50;
+      padding-left: 20px;
+      margin-bottom: 30px;
+    }
+    .tag-pill {
+      display: inline-block;
+      background-color: #f0f0f0;
+      padding: 4px 10px;
+      margin: 3px 4px 3px 0;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    select, button {
+      padding: 10px;
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
   </style>
 </head>
 <body>
-  <h1>질문 응답</h1>
-  <div id="question-container" class="question-box">
-    <div id="tag-info" class="tag"></div>
-    <div id="question-text">로딩 중...</div>
-    <p id="guideline-text" class="guide"></p>
-    <textarea id="answer-text" class="textarea" placeholder="여기에 답변을 입력하세요"></textarea>
-  </div>
-  <div class="btn-group">
-    <button onclick="nextQuestion()">다음 질문</button>
-    <button onclick="forceFinish()">평가하기</button>
+
+  <h1>📘 BCTA 질문 시작</h1>
+
+  <label for="target">대상 선택:</label>
+  <select id="target">
+    <option value="">대상 선택</option>
+    <option value="초등학생">초등학생 (Elementary)</option>
+    <option value="중학생">중학생 (Middle School)</option>
+    <option value="고등학생">고등학생 (High School)</option>
+    <option value="대학생">대학생 (University)</option>
+    <option value="직장인">직장인 (Professional)</option>
+  </select>
+
+  <button onclick="loadQuestion()">지금 바로 평가하기 / Evaluate Now / قيّم الآن</button>
+
+  <div id="questionDisplay" class="question-box" style="display:none;">
+    <p><strong>[KR]</strong> <span id="kr-question"></span></p>
+    <p><strong>[EN]</strong> <span id="en-question"></span></p>
+    <p><strong>[AR]</strong> <span id="ar-question"></span></p>
+    <div id="tag-info"></div>
   </div>
 
   <script>
-    let questions = [];
-    let currentIndex = 0;
-
-    const guideMap = {
-      "CT-q1": {
-        kr: "당신이 어떤 판단을 내렸는지 말한 뒤, 그 판단이 왜 옳다고 생각하는지를 구체적으로 설명해보세요. 다른 사람의 입장도 고려했는지, 어떤 기준으로 판단했는지도 함께 적어보면 좋아요.",
-        en: "Explain what decision you made, and why you think it was the right one. Did you consider other perspectives or use any criteria in your judgment?",
-        ar: "اشرح ما هو القرار الذي اتخذته ولماذا تعتقد أنه القرار الصحيح. هل أخذت بعين الاعتبار آراء الآخرين أو استخدمت معايير محددة؟"
+    const questions = [
+      {
+        target: "초등학생",
+        code: "CT-q1",
+        evaluation: "판단형",
+        kr: "친구가 규칙을 어겼을 때, 선생님께 말하는 것이 옳은 일일까요?",
+        en: "Is it the right thing to tell the teacher when a friend breaks the rules?",
+        ar: "هل من الصواب إبلاغ المعلم عندما يخالف صديق القواعد؟",
+        tags: ["판단", "윤리", "책임감", "갈등"]
       },
-      "CT-q2": {
-        kr: "어떤 일이 일어난 이유와 그로 인해 생긴 결과를 차례대로 설명해보세요. 단순히 '왜 그런지'가 아니라, '그 이유가 왜 중요한지'까지 생각해보면 더 깊은 답변이 될 거예요.",
-        en: "Describe the cause of an event and the result step-by-step. Go beyond 'why'—think about why that reason matters.",
-        ar: "اشرح سبب حدوث الموقف وما هي نتائجه بشكل متسلسل. لا تكتفِ بالسؤال 'لماذا'، بل فكر في أهمية السبب أيضًا."
+      {
+        target: "초등학생",
+        code: "CT-q2",
+        evaluation: "인과분석형",
+        kr: "왜 친구끼리 서로 도와야 하는 걸까요?",
+        en: "Why should friends help each other?",
+        ar: "لماذا يجب على الأصدقاء مساعدة بعضهم البعض؟",
+        tags: ["인과분석", "인간관계", "공감", "책임감"]
       },
-      "CT-q3": {
-        kr: "두 가지 이상의 대상(사람, 사건, 개념 등)을 비교하면서 공통점과 차이점을 예시와 함께 설명해보세요. 각각의 장단점이나 상황에 따라 달라지는 부분도 같이 언급하면 훌륭해요.",
-        en: "Compare two or more subjects by explaining similarities and differences with examples. Mention strengths, weaknesses, or context-based differences.",
-        ar: "قارن بين موضوعين أو أكثر من خلال إبراز أوجه الشبه والاختلاف مع أمثلة توضيحية. وضّح أيضًا المزايا والعيوب أو الفروقات حسب السياق."
-      },
-      "CT-q4": {
-        kr: "질문에서 주어진 상황을 다른 맥락이나 현실 문제에 어떻게 적용할 수 있을지 상상해보세요. 또, 그런 적용이 왜 타당한지 근거를 제시하고, 새로운 관점이나 아이디어로 확장해보세요.",
-        en: "Apply the situation to a new context or real issue. Justify why the application is relevant, and expand with new ideas or viewpoints.",
-        ar: "حاول تطبيق الموقف على سياق مختلف أو مشكلة واقعية. فسّر لماذا يعتبر هذا التطبيق مناسبًا، ووسع الفكرة من خلال منظور جديد."
-      },
-      "CT-q5": {
-        kr: "당신의 실제 경험, 주변에서 본 사례 또는 뉴스를 예로 들어 설명해보세요. 그 사례가 왜 이 질문에 적절한지 이유까지 함께 설명해보면 좋아요.",
-        en: "Support your answer with personal experience, case studies, or news. Explain why this example fits the question.",
-        ar: "استخدم تجربة واقعية، حالة شاهدتها أو خبرًا كمثال. وفسر لماذا هذا المثال مناسب لهذا السؤال."
-      },
-      "CT-q6": {
-        kr: "자신의 생각을 다시 돌아보며 부족했던 점이나 바뀐 생각, 실수한 부분이 있었다면 솔직하게 적어보세요. 그리고 다음에 어떻게 더 나은 판단을 할 수 있을지 적어보세요.",
-        en: "Reflect on your thinking. Mention any weaknesses, changes in opinion, or mistakes. Explain how you will improve your judgment in the future.",
-        ar: "فكر في تفكيرك السابق، وكن صريحًا بشأن نقاط الضعف أو التغيرات أو الأخطاء. واشرح كيف يمكنك تحسين حكمك لاحقًا."
+      {
+        target: "초등학생",
+        code: "CT-q4",
+        evaluation: "추론확장형",
+        kr: "만약 학교에 숙제가 없다면 어떤 일이 벌어질까요?",
+        en: "What might happen if there were no homework in school?",
+        ar: "ماذا سيحدث إذا لم يكن هناك واجبات منزلية في المدرسة؟",
+        tags: ["추론", "교육", "혼란", "책임감"]
       }
-    };
+    ];
 
-    // 초기화
-    window.addEventListener('load', () => {
-      localStorage.removeItem('ct-answers');
-    });
-
-    async function loadQuestions() {
-      const res = await fetch('questions.json');
-      const allQuestions = await res.json();
-      const selectedTarget = localStorage.getItem('selectedTarget');
-      if (!selectedTarget) {
-        alert("대상을 먼저 선택해주세요.");
-        window.location.href = "index.html";
+    function loadQuestion() {
+      const target = document.getElementById("target").value;
+      const display = document.getElementById("questionDisplay");
+      const filtered = questions.filter(q => q.target === target);
+      if (filtered.length === 0) {
+        alert("선택한 대상에 해당하는 질문이 없습니다.");
+        display.style.display = "none";
         return;
       }
-      questions = allQuestions.filter(q => q.target === selectedTarget);
-      if (questions.length === 0) {
-        alert(`'${selectedTarget}'에 해당하는 질문이 없습니다.`);
-        return;
-      }
-      showQuestion();
-    }
+      const q = filtered[Math.floor(Math.random() * filtered.length)];
+      document.getElementById("kr-question").textContent = q.kr;
+      document.getElementById("en-question").textContent = q.en;
+      document.getElementById("ar-question").textContent = q.ar;
 
-    function showQuestion() {
-      const q = questions[currentIndex];
-      const tag = q.tag || q.tags || "";
-      const lang = localStorage.getItem("lang") || "kr";
-
-      document.getElementById("question-text").innerText = `Q${currentIndex + 1}. ${q.question}`;
-      document.getElementById("answer-text").value = getAnswer(currentIndex);
-      document.getElementById("tag-info").innerText = tag ? `태그: ${tag}` : "";
-
-      const guide = guideMap[tag]?.[lang] || "";
-      document.getElementById("guideline-text").innerText = guide;
-    }
-
-    function getAnswer(index) {
-      const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
-      return data[`q${index}`]?.answer || "";
-    }
-
-    async function nextQuestion() {
-      const answer = document.getElementById("answer-text").value.trim();
-      if (answer.length === 0) {
-        alert("답변을 입력해주세요.");
-        return;
-      }
-      if (answer.length < 10) {
-        alert("답변이 너무 짧습니다. 최소 10자 이상 작성해주세요.");
-        return;
-      }
-
-      saveAnswer(currentIndex, answer);
-      if (currentIndex > 0) {
-        await evaluateWithGPT(currentIndex - 1, getAnswer(currentIndex - 1));
-      }
-
-      if (currentIndex < questions.length - 1) {
-        currentIndex++;
-        showQuestion();
-      } else {
-        alert("모든 질문이 완료되었습니다.");
-        window.location.href = "result.html";
-      }
-    }
-
-    async function forceFinish() {
-      const answer = document.getElementById("answer-text").value.trim();
-      if (answer.length === 0) {
-        alert("답변을 입력해주세요.");
-        return;
-      }
-
-      saveAnswer(currentIndex, answer);
-      if (currentIndex > 0) {
-        await evaluateWithGPT(currentIndex - 1, getAnswer(currentIndex - 1));
-      }
-
-      alert("평가가 완료되었습니다.");
-      window.location.href = "result.html";
-    }
-
-    function saveAnswer(index, answer) {
-      const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
-      data[`q${index}`] = { answer };
-      localStorage.setItem("ct-answers", JSON.stringify(data));
-    }
-
-    async function evaluateWithGPT(index, answer) {
-      const question = questions[index];
-      const payload = {
-        question: question.question,
-        answer: answer,
-        rubric: "CT1~CT6 루브릭에 따라 평가해주세요.",
-        tags: question.tags || question.tag
-      };
-
-      try {
-        const res = await fetch("/api/evaluate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+      const tagContainer = document.getElementById("tag-info");
+      tagContainer.innerHTML = "";
+      if (Array.isArray(q.tags)) {
+        q.tags.forEach(t => {
+          const span = document.createElement("span");
+          span.textContent = t;
+          span.className = "tag-pill";
+          tagContainer.appendChild(span);
         });
-        const result = await res.json();
-        const data = JSON.parse(localStorage.getItem("ct-answers") || "{}");
-        data[`q${index}`].evaluation = result;
-        localStorage.setItem("ct-answers", JSON.stringify(data));
-      } catch (err) {
-        console.error("GPT 평가 실패:", err);
       }
-    }
 
-    loadQuestions();
+      display.style.display = "block";
+    }
   </script>
 </body>
 </html>
